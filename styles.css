@@ -1,0 +1,22 @@
+body {
+  background: grey;
+  color: #f8f8f8;
+}canvas {
+  background: #f8f8f8;
+  padding: 0;
+  margin: 0 auto;
+  display: block;
+}
+div{
+    display: inline-block;
+}
+#rect1 {
+    height: 100px;
+    width: 100px;
+  background-color: black;
+}
+#rect2{
+    height: 50px;
+    width: 50px;
+    background-color: red;
+}
