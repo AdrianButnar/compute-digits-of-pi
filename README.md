@@ -1,5 +1,8 @@
 # Compute digits of π using elastic collisions
 
+<!-- gif part -->
+![](sample.gif)
+
 ## 1. Motivation
 The whole idea of this project started from this awesome 3Blue1Brown <a href="https://www.youtube.com/watch?v=HEfHFsfGXjs"> youtube video </a>.
 He has a wonderful channel and 3 videos presenting how elastic collisions can relate to the notion of phase(phase diagram) and yield the digits of π.

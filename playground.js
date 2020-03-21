@@ -1,83 +1,123 @@
-let decimals = 0; // how many decimals of pi you want to compute (>=0)
-let collisions_count = 0;
+let decimals; // how many decimals of pi you want to compute (>=0)
+let collisionsCount = 0;
 let block1;
 let block2;
 let clackSound;
 let beginningFlag = true;
 let canvas;
-
+let descText;
 function preload(){
     sound = new Audio("collision.wav");
 }
 
 function setup() {
     countDiv = createDiv("Edit the numbers of decimals below and then click on the white canvas:");
+    countDiv.attribute("id","countDiv");
     countDiv.style('font-size', '40pt');
     countDiv.style('text-align', 'center');
     countDiv.style("width","100%");
-    countDiv.style("padding-bottom","3%");
+    countDiv.style("padding-bottom","1%");
 
-    digitsDiv = createDiv("0");
-    digitsDiv.attribute("contenteditable", "true");
-    digitsDiv.attribute("id","digitsDiv");
-    digitsDiv.style('font-size', '28pt');
-    digitsDiv.style('text-align', 'center');
-    digitsDiv.style("padding-bottom", "5%");
-    digitsDiv.style("width","100%");
-    digitsDiv.style("padding-bottom","3%");
+    //input
+    digitsInput = createInput("0");
+    digitsInput.attribute("id","digitsInput");
+    digitsInput.style('font-size', '28pt');
+    digitsInput.style('line-height', '100%');
+    digitsInput.style('border', 'rgb(70, 71, 71)');
+    digitsInput.style('text-color', 'white');
+    digitsInput.style('text-align', 'center');
+    digitsInput.style('background',"rgb(70, 71, 71)");
+    digitsInput.style('width',"100%");
+    digitsInput.style('padding-bottom',"1%");
+    digitsInput.style('padding-top',"1%");
+    digitsInput.style('color',"white");
 
+    //canvas
     canvas = createCanvas(windowWidth,200);
-    canvas.mouseClicked(start_moving);
-    block2 = new Box(300,100,0,100); //set speed to 0 initially(apparently 100^x != 100 ** x, the last one being power)
-    block1 = new Box(100,35,0,1);
-    block1.show();
-    block2.show(); 
-    
+    canvas.mouseClicked(startMoving);
+
+    //reset button
+    var resetBtn = createButton("RESET");
+    resetBtn.style("margin-top","1%");
+    resetBtn.attribute("class","button");
+    resetBtn.mousePressed(resetPlayground);
+
+    ///info div
+    infoDiv = createDiv();
+    infoDiv.style("padding-top","1%");
+    infoDiv.style('font-size', '15pt');
+    infoDiv.style('display','none');
+
+    resetPlayground();
 }
 
-function start_moving(){
+function resetPlayground(){
+  block2 = new Box(300,100,0,100); //set speed to 0 initially(apparently 100^x != 100 ** x, the last one being power)
+  block1 = new Box(100,35,0,1);
+  block1.show();
+  block2.show(); 
 
-  //prevent accidental click when the blocks are already moving
-  if (block2.speed === 0){
-    decimals = document.getElementById("digitsDiv").innerHTML;
+  //reset data
+  beginningFlag = true;
+  collisionsCount = 0;
+  document.getElementById("countDiv").innerHTML = "Edit the numbers of decimals below and then click on the white canvas:";
+  infoDiv.style('display','none');
+  infoDiv.style('color', 'white');
+  noLoop(); // prevent continuous redrawing when waiting for user input
+}
+
+function startMoving(){
+  if (block2.speed === 0){  //prevent accidental click when the blocks are already moving
+    decimals = document.getElementById("digitsInput").value;
     if (isNaN(parseInt(decimals)) || !(0 <= parseInt(decimals) && parseInt(decimals) <= 6)){
-      alert("The number of decimals should be between 0 and 6 \n I suggest at most 4 in order to enjoy the animation, otherwise you will see what happens because of the crazy speeds resulted from the ellastic collisions:) )");
-      digitsDiv.html("0");
+      infoDiv.html("The number of decimals has to be between 0 and 6. <br> An ideal value should be at most 4, otherwise the animation will lag because of the extreme speeds resulted from the collisions(as the mass of the right block is 100<sup>number_of_decimals</sup> times the mass of the left one)");
+      infoDiv.style('display','block');
+      infoDiv.style('color', 'red');
+      infoDiv.style('font-size','15pt');
+      digitsInput.html("0");
+      noLoop(); // prevent continuous redrawing when waiting for user input
     }
     else{
       decimals = parseInt(decimals); 
+      console.log(decimals);
       if (block2.speed === 0) {
         block2.mass = 100 ** decimals;
-        timeSteps = 13 ** (decimals - 1);
+        timeSteps = 15 ** (decimals - 1);
         block2.speed = -1/timeSteps;
         beginningFlag = false;
       }
-      ///create info tab
-      infoDiv = createDiv("The left block has unit mass and the mass of the right block is ".concat(100**decimals.toString()).concat(" units."));
-      infoDiv.style("padding-top","3%")
-      infoDiv.style('font-size', '15pt');
+      //adjust the info section
+      infoDiv.style('color', 'white');
+      
+      descText = "The purpose of this experiment is to compute the digits of π using elastic collisions between two blocks.\
+      <br> Elastic collisions involve both conservation of momentum and energy, which combined with a phase representation of the dynamic of the system computes the digits of π.\
+      <br> The mass of the right block is 100<sup>".concat(decimals.toString()).concat("</sup> times the mass of the left one.\
+      <br> More information can be found on my <a style = 'color: rgb(177, 238, 242)'href = 'https://github.com/AdrianButnar/compute-digits-of-pi' > repository page</a>. ");
+
+      infoDiv.html(descText);
+      infoDiv.style('display','block');
+      loop(); //draw only when a valid input is given
     }
   }
 }
 
 function draw(){ //called immediately after setup
-    timeSteps = 13 ** (decimals - 1);
+    timeSteps = 15 ** (decimals - 1);
     background(500); //color code
     clackSound = false;
     for (let i = 0; i < timeSteps; i++) {
         if (block1.collide(block2)) {
-            console.log("collision")
-          const v1 = block1.get_speed_after_impact_with(block2);
-          const v2 = block2.get_speed_after_impact_with(block1);
+          const v1 = block1.getSpeedAfterImpactWith(block2);
+          const v2 = block2.getSpeedAfterImpactWith(block1);
           block1.speed = v1;
           block2.speed = v2;
-          collisions_count++;
+          collisionsCount++;
           clackSound = true;
         }
     
-        if (block1.hits_wall()) {
+        if (block1.hitsWall()) {
           block1.speed *= -1;
-          collisions_count++;
+          collisionsCount++;
           clackSound = true;
 
         }
@@ -92,9 +132,9 @@ function draw(){ //called immediately after setup
     block1.show();
     block2.show(); 
     if (!beginningFlag){
-      countDiv.html("Number of collisions: ".concat(collisions_count.toString()));
-      digitsDiv.attribute("contenteditable", "false");
-      digitsDiv.html("");
+      countDiv.html("Number of collisions: ".concat(collisionsCount.toString()));
+      digitsInput.attribute("contenteditable", "false");
+      digitsInput.html("");
     }
     
 }

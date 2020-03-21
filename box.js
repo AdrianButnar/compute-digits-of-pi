@@ -16,16 +16,16 @@ class Box{
         rect(this.x,this.y,this.w,this.w);
     }
 
-    collide(other_block){
+    collide(otherBlock){
         //when the two blocks collide
-        return other_block.x <= this.x + this.w
+        return otherBlock.x <= this.x + this.w
     }
 
-    get_speed_after_impact_with(other_block){
-        return (2*other_block.mass*other_block.speed + (this.mass - other_block.mass) * this.speed) /(this.mass + other_block.mass) //speed resulted from the conservation of energy and momentum
+    getSpeedAfterImpactWith(otherBlock){
+        return (2*otherBlock.mass*otherBlock.speed + (this.mass - otherBlock.mass) * this.speed) /(this.mass + otherBlock.mass) //speed resulted from the conservation of energy and momentum
     }
 
-    hits_wall(){
+    hitsWall(){
         return this.x <= 0
     }
 }
