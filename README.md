@@ -34,4 +34,6 @@ For further technical details, please do check the valuable resources mentioned 
 
 P.s.: As today is March 14, happy π day!
 
+Update: A hosted version can be found <a href = "https://tennis.ml/compute-digits-of-pi">here</a>.
+
 
